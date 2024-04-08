@@ -6,29 +6,32 @@ from core.print_output import print_output, print_input
 import configparser
 
 config = configparser.ConfigParser()
-config.read('configuration.ini')
-interface = config.get('Settings', 'WiFiInterface')    
+config.read("configuration.ini")
+interface = config.get("Settings", "WiFiInterface")
+
 
 def print_banner():
-       return ("""
+    return """
                 __             _                            
     ____  ___  / /__________  (_)___  ____  ____ _____ ____ 
    / __ \/ _ \/ __/ ___/ __ \/ / __ \/ __ \/ __ `/ __ `/ _ \\
   / / / /  __/ /_(__  ) /_/ / / /_/ / / / / /_/ / /_/ /  __/
  /_/ /_/\___/\__/____/ .___/_/\____/_/ /_/\__,_/\__, /\___/ 
                     /_/                        /____/           
-""")
+"""
+
 
 def print_details():
-    return("""
+    return """
  Created by Angelina Tsuboi [angelinatsuboi.net] V.0.0.1
 
  https://github.com/ANG13T/netspionage
  ----------------------------------------------------------------------------
-       """)
+       """
+
 
 def menu_display():
-    return ("""
+    return """
  ENTER 1 - 4 TO SELECT OPTIONS
 
  1.  SCANNING                   Scan for IPs, nearby APs, ports, hosts, and more
@@ -38,15 +41,16 @@ def menu_display():
  3.  DETECTION                  Detect for ARP Spoofing and SYN Flood attacks
 
  4.  EXIT                       Exit from netspionage to your terminal
-       """)
+       """
 
-def prompt_display():  
+
+def prompt_display():
     print_output(print_banner())
     print_output(print_details())
     print_output(menu_display())
     while 1:
         user_input = print_input("\n netspionage >> ")
-        if len(user_input)==0:
+        if len(user_input) == 0:
             print_output("\n")
             continue
         if user_input == "help" or user_input == "options" or user_input == "commands":
@@ -61,7 +65,9 @@ def prompt_display():
 
         if choice == 1:
             while 1:
-                print_output("\n 1. Network Scanner \n\n 2. WiFi Scanner \n\n 3. Port Scanner \n")
+                print_output(
+                    "\n 1. Network Scanner \n\n 2. WiFi Scanner \n\n 3. Port Scanner \n"
+                )
                 resp = print_input(" SCAN INPUT >> ")
                 target = ""
                 if resp == "1" or resp == "3":
@@ -79,7 +85,9 @@ def prompt_display():
                     target = print_input(" NET IP ADDRESS (Eg: 192.168.1.1/24) >> ")
                 manual_input = ""
                 if resp == "2":
-                    manual_input = print_input(" MAC ADDRESS (Eg:08:00:69:02:01:FC) >> ")
+                    manual_input = print_input(
+                        " MAC ADDRESS (Eg:08:00:69:02:01:FC) >> "
+                    )
                 break
             recon_choice(resp, target, manual_input)
             continue
@@ -97,12 +105,13 @@ def prompt_display():
             continue
 
         elif choice == 4:
-            exit('\n Till next time!')
+            exit("\n Till next time!")
 
         else:
             pass
 
+
 try:
     prompt_display()
 except KeyboardInterrupt:
-    quit('\n Till next time!')
+    quit("\n Till next time!")

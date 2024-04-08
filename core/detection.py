@@ -1,18 +1,19 @@
 from scapy.all import Ether, ARP, srp, sniff, conf
 from core.print_output import print_output
 
-interface="wlan0"
+interface = "wlan0"
 IP = "192.168.1.1/24"
 TCP = "80"
 
+
 def detect_choice(choice, target, tcp, intf):
     interface = intf
-    if choice == '1':
+    if choice == "1":
         arp_detection(target)
-        return()
-    elif choice == '2':
+        return ()
+    elif choice == "2":
         tcp_flood_detection(target, tcp)
-        return()
+        return ()
     else:
         exit()
 
@@ -23,20 +24,25 @@ def arp_detection(target):
     print_output(" CTRL+C to EXIT")
     sniff(store=False, prn=process_arp, iface=interface)
 
+
 def tcp_flood_detection(target, tcp):
     TCP = tcp
     print_output("\n [RUNNING] TCP Flood Detector")
     print_output(" CTRL+C to EXIT")
     sniff(prn=flow_labels, store=0)
 
+
 # Helper Functions
 
+
 def get_mac(ip):
-    p = Ether(dst='ff:ff:ff:ff:ff:ff')/ARP(pdst=ip)
+    p = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip)
     result = srp(p, timeout=3, verbose=False)[0]
     return result[0][1].hwsrc
 
+
 # ARP Spoof Attack Detection
+
 
 def process_arp(packet):
     if packet.haslayer(ARP):
@@ -49,32 +55,38 @@ def process_arp(packet):
                 response_mac = packet[ARP].hwsrc
                 # if they're different, definitely there is an attack
                 if real_mac != response_mac:
-                    print(f"[!] You are under ATTACK, REAL-MAC: {real_mac.upper()}, FAKE-MAC: {response_mac.upper()}")
+                    print(
+                        f"[!] You are under ATTACK, REAL-MAC: {real_mac.upper()}, FAKE-MAC: {response_mac.upper()}"
+                    )
             except IndexError:
                 # unable to find the real mac
                 # may be a fake IP or firewall is blocking packets
                 pass
 
-# TCP Flood Attack Detection 
+
+# TCP Flood Attack Detection
+
 
 def flow_labels(pkt):
     if IP in pkt:
-        ipsrc = str(pkt[IP].src)                     # source IP
-        ipdst = str(pkt[IP].dst)                     # destination IP
+        ipsrc = str(pkt[IP].src)  # source IP
+        ipdst = str(pkt[IP].dst)  # destination IP
         try:
-            sport = str(pkt[IP].sport)               # source port
-            dport = str(pkt[IP].dport)               # destination port
+            sport = str(pkt[IP].sport)  # source port
+            dport = str(pkt[IP].dport)  # destination port
         except:
             sport = ""
             dport = ""
-        prtcl = pkt.getlayer(2).name                 # protocol
+        prtcl = pkt.getlayer(2).name  # protocol
 
-        flow = '{:<4} | {:<16} | {:<6} | {:<16} | {:<6} | '.format(prtcl, ipsrc, sport, ipdst, dport)
+        flow = "{:<4} | {:<16} | {:<6} | {:<16} | {:<6} | ".format(
+            prtcl, ipsrc, sport, ipdst, dport
+        )
         print(flow)
 
     # TCP SYN packet
     if TCP in pkt and pkt[TCP].flags & 2:
-        src = pkt.sprintf('{IP:%IP.src%}{IPv6:%IPv6.src%}')
+        src = pkt.sprintf("{IP:%IP.src%}{IPv6:%IPv6.src%}")
         syn_count[src] += 1
         if syn_count.most_common(1)[0][1] > 25 and pkt.ack == 0:
             print_output("[!] You are under ATTACK")

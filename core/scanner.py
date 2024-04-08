@@ -13,23 +13,26 @@ wifi_scan_timeout = 10
 networks = pandas.DataFrame(columns=["BSSID", "SSID", "RSSI", "Channel", "Encryption"])
 networks.set_index("BSSID", inplace=True)
 
+
 def scanner_choice(choice, target, intf):
     interface = intf
-    if choice == '1':
+    if choice == "1":
         network_scanner(target)
-        return()
-    elif choice == '2':
+        return ()
+    elif choice == "2":
         wifi_scanner()
-        return()
-    elif choice == '3':
+        return ()
+    elif choice == "3":
         port_scanner(target)
-        return()
+        return ()
     else:
         exit()
+
 
 # Port Scanner Configs
 scan_start = 1
 scan_end = 1025
+
 
 def network_scanner(target):
     broadcast_packets = create_packet(target)
@@ -37,29 +40,40 @@ def network_scanner(target):
     entries = parse_response(success_packets)
     print_analysis(entries)
 
+
 # TODO: test with wifi adapter
 def wifi_scanner():
     initiate_wifi_scan()
 
+
 def port_scanner(target):
     scan_ports(target)
 
+
 # Network Scanner
+
 
 def create_packet(ip):
     arp_request = scapy.ARP(pdst=ip)  # create a ARP request object by scapy
     broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")  # We have set the destination
     arp_request_broadcast = broadcast / arp_request
-    return (arp_request_broadcast)
+    return arp_request_broadcast
 
 
 def transmit_packet(packet):
     success_list, failure_list = scapy.srp(packet, timeout=1)
     return success_list
 
+
 # TODO: handle more OS options
 def get_os(ip_addr):
-    ttl_values = {32: "Windows", 60: "MAC OS", 64: "Linux", 128: "Windows", 255: "Linux 2.4 Kernal"}
+    ttl_values = {
+        32: "Windows",
+        60: "MAC OS",
+        64: "Linux",
+        128: "Windows",
+        255: "Linux 2.4 Kernal",
+    }
     try:
         ans = scapy.sr1(IP(dst=str(ip_addr)) / ICMP(), timeout=1, verbose=0)
         if ans:
@@ -72,24 +86,35 @@ def get_os(ip_addr):
     except:
         return "could not figure the OS version"
 
+
 def parse_response(success_list):
     print_output(success_list)
     targets = []
     for success in success_list:
-        entry = {'ip': success[1].psrc, 'mac': success[1].hwsrc}
+        entry = {"ip": success[1].psrc, "mac": success[1].hwsrc}
         targets.append(entry)
     return targets
+
 
 def print_analysis(element_entries):
     print_output("end")
     print_output("IP\t\t\tMAC Address\t\t\tOPERATING SYSTEM")
     print_output("." * 100)
     for element in element_entries:
-        print_output(element["ip"] + "\t\t" + element['mac'] + "\t\t" + get_os(element["ip"]) + "\n")
+        print_output(
+            element["ip"]
+            + "\t\t"
+            + element["mac"]
+            + "\t\t"
+            + get_os(element["ip"])
+            + "\n"
+        )
     print_output("." * 100)
     print_output("\n Scan Complete!")
 
+
 # WiFi Scanner
+
 
 def initiate_wifi_scan():
     # start the thread that prints all the networks
@@ -102,6 +127,7 @@ def initiate_wifi_scan():
     channel_changer.start()
     # start sniffing
     scapy.sniff(prn=extract_network_info, iface=interface)
+
 
 def extract_network_info(packet):
     if packet.haslayer(scapy.Dot11Beacon):
@@ -137,7 +163,9 @@ def change_channel():
         ch = ch % 14 + 1
         time.sleep(0.5)
 
+
 # Port Scanner
+
 
 # TODO: make threaded port scanner to increase speed [https://www.thepythoncode.com/article/make-port-scanner-python]
 def scan_ports(host):
@@ -151,6 +179,7 @@ def scan_ports(host):
             close_count += 1
             print_output(f"\n [!] {host}:{port} is CLOSED!")
     print_output(f"\n {open_count} OPEN Ports \n {close_count} CLOSED Ports")
+
 
 def check_port(host, port):
     s = socket.socket()
