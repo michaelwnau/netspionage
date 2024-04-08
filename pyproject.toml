@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "netspionage"
+version = "0.1.1"
+description = "Network Forensics CLI utility that performs Network Scanning, OSINT, and Attack Detection. Created by Angelina Tsuboi [angelinatsuboi.net] V.0.0.1"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.31.0"
+scapy = "^2.5.0"
+pandas = "^2.2.1"
+pick = "^2.2.0"
+termcolor = "^2.4.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
