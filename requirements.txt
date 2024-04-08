@@ -1,6 +1,0 @@
-scapy
-pandas
-pick
-requests==2.28.0
-ruff
-termcolor
